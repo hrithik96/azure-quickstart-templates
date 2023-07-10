@@ -1,125 +1,376 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "webAppName": {
-      "type": "string",
-      "defaultValue": "[concat('webApp-', uniqueString(resourceGroup().id))]",
-      "minLength": 2,
-      "metadata": {
-        "description": "Web app name."
-      }
-    },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Location for all resources."
-      }
-    },
-    "sku": {
-      "type": "string",
-      "defaultValue": "F1",
-      "metadata": {
-        "description": "The SKU of App Service Plan."
-      }
-    },
-    "language": {
-      "type": "string",
-      "defaultValue": ".net",
-      "allowedValues": [
-        ".net",
-        "php",
-        "node",
-        "html"
-      ],
-      "metadata": {
-        "description": "The language stack of the app."
-      }
-    },
-    "helloWorld": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "true = deploy a sample Hello World app."
-      }
-    },
-    "repoUrl": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Optional Git Repo URL"
-      }
-    }
-  },
-  "variables": {
-    "appServicePlanPortalName": "[concat('AppServicePlan-', parameters('webAppName'))]",
-    "gitRepoReference": {
-      ".net": "https://github.com/Azure-Samples/app-service-web-dotnet-get-started",
-      "node": "https://github.com/Azure-Samples/nodejs-docs-hello-world",
-      "php": "https://github.com/Azure-Samples/php-docs-hello-world",
-      "html": "https://github.com/Azure-Samples/html-docs-hello-world"
-    },
-    "gitRepoUrl": "[if(bool(parameters('helloWorld')), variables('gitRepoReference')[toLower(parameters('language'))], parameters('repoUrl'))]",
-    "configReference": {
-      ".net": {
-        "comments": ".Net app. No additional configuration needed."
-      },
-      "html": {
-        "comments": "HTML app. No additional configuration needed."
-      },
-      "php": {
-        "phpVersion": "7.4"
-      },
-      "node": {
-        "appSettings": [
-          {
-            "name": "WEBSITE_NODE_DEFAULT_VERSION",
-            "value": "12.15.0"
-          }
-        ]
-      }
-    }
-  },
-  "resources": [
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2020-06-01",
-      "name": "[variables('appServicePlanPortalName')]",
-      "location": "[parameters('location')]",
-      "sku": {
-        "name": "[parameters('sku')]"
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites",
-      "apiVersion": "2020-06-01",
-      "name": "[parameters('webAppName')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]"
-      ],
-      "properties": {
-        "siteConfig": "[variables('configReference')[parameters('language')]]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]"
-      },
-      "resources": [
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": [
         {
-          "condition": "[contains(variables('gitRepoUrl'),'http')]",
-          "type": "sourcecontrols",
-          "apiVersion": "2020-06-01",
-          "name": "web",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
-          ],
-          "properties": {
-            "repoUrl": "[variables('gitRepoUrl')]",
-            "branch": "master",
-            "isManualIntegration": true
-          }
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-09-01",
+            "name": "SPOCogsLRPBackend",
+            "location": "West US",
+            "tags": {
+                "hidden-related:/subscriptions/5e4121de-9c4d-4b7f-88c5-d5e4347642fd/resourceGroups/cogs-pipelines-rg/providers/Microsoft.Web/serverFarms/Web20211026174446Plan": "empty"
+            },
+            "kind": "app",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "spocogslrpbackend.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "spocogslrpbackend.scm.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "/subscriptions/5e4121de-9c4d-4b7f-88c5-d5e4347642fd/resourceGroups/cogs-pipelines-rg/providers/Microsoft.Web/serverfarms/Web20211026174446Plan",
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "vnetRouteAllEnabled": false,
+                "vnetImagePullEnabled": false,
+                "vnetContentShareEnabled": false,
+                "siteConfig": {
+                    "numberOfWorkers": 1,
+                    "acrUseManagedIdentityCreds": false,
+                    "alwaysOn": false,
+                    "http20Enabled": false,
+                    "functionAppScaleLimit": 0,
+                    "minimumElasticInstanceCount": 1
+                },
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "clientCertMode": "Required",
+                "hostNamesDisabled": false,
+                "customDomainVerificationId": "A79A880E6D78856BA6BBDAEA88870D4839E018F0223C863B3CA765880C18E0E7",
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": true,
+                "redundancyMode": "None",
+                "storageAccountRequired": false,
+                "keyVaultReferenceIdentity": "SystemAssigned"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+            "apiVersion": "2022-09-01",
+            "name": "SPOCogsLRPBackend/ftp",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', 'SPOCogsLRPBackend')]"
+            ],
+            "tags": {
+                "hidden-related:/subscriptions/5e4121de-9c4d-4b7f-88c5-d5e4347642fd/resourceGroups/cogs-pipelines-rg/providers/Microsoft.Web/serverFarms/Web20211026174446Plan": "empty"
+            },
+            "properties": {
+                "allow": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+            "apiVersion": "2022-09-01",
+            "name": "SPOCogsLRPBackend/scm",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', 'SPOCogsLRPBackend')]"
+            ],
+            "tags": {
+                "hidden-related:/subscriptions/5e4121de-9c4d-4b7f-88c5-d5e4347642fd/resourceGroups/cogs-pipelines-rg/providers/Microsoft.Web/serverFarms/Web20211026174446Plan": "empty"
+            },
+            "properties": {
+                "allow": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2022-09-01",
+            "name": "SPOCogsLRPBackend/web",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', 'SPOCogsLRPBackend')]"
+            ],
+            "tags": {
+                "hidden-related:/subscriptions/5e4121de-9c4d-4b7f-88c5-d5e4347642fd/resourceGroups/cogs-pipelines-rg/providers/Microsoft.Web/serverFarms/Web20211026174446Plan": "empty"
+            },
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v6.0",
+                "phpVersion": "5.6",
+                "requestTracingEnabled": true,
+                "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "httpLoggingEnabled": true,
+                "acrUseManagedIdentityCreds": false,
+                "logsDirectorySizeLimit": 100,
+                "detailedErrorLoggingEnabled": true,
+                "publishingUsername": "$SPOCogsLRPBackend",
+                "scmType": "VSTSRM",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": false,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "vnetRouteAllEnabled": false,
+                "vnetPrivatePortsCount": 0,
+                "localMySqlEnabled": false,
+                "managedServiceIdentityId": 29755,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 2147483647,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 2147483647,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "scmMinTlsVersion": "1.0",
+                "ftpsState": "AllAllowed",
+                "preWarmedInstanceCount": 0,
+                "elasticWebAppScaleLimit": 0,
+                "functionsRuntimeScaleMonitoringEnabled": false,
+                "minimumElasticInstanceCount": 1,
+                "azureStorageAccounts": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2022-09-01",
+            "name": "SPOCogsLRPBackend/spocogslrpbackend.azurewebsites.net",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', 'SPOCogsLRPBackend')]"
+            ],
+            "properties": {
+                "siteName": "SPOCogsLRPBackend",
+                "hostNameType": "Verified"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/siteextensions",
+            "apiVersion": "2022-09-01",
+            "name": "SPOCogsLRPBackend/Microsoft.AspNetCore.AzureAppServices.SiteExtension",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', 'SPOCogsLRPBackend')]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/slots",
+            "apiVersion": "2022-09-01",
+            "name": "spocogslrpbackend/dev",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', 'spocogslrpbackend')]"
+            ],
+            "kind": "app",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "spocogslrpbackend-dev.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "spocogslrpbackend-dev.scm.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "/subscriptions/5e4121de-9c4d-4b7f-88c5-d5e4347642fd/resourceGroups/cogs-pipelines-rg/providers/Microsoft.Web/serverfarms/Web20211026174446Plan",
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "vnetRouteAllEnabled": false,
+                "vnetImagePullEnabled": false,
+                "vnetContentShareEnabled": false,
+                "siteConfig": {
+                    "numberOfWorkers": 1,
+                    "acrUseManagedIdentityCreds": false,
+                    "alwaysOn": false,
+                    "http20Enabled": false,
+                    "functionAppScaleLimit": 0,
+                    "minimumElasticInstanceCount": 1
+                },
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "clientCertMode": "Required",
+                "hostNamesDisabled": false,
+                "customDomainVerificationId": "A79A880E6D78856BA6BBDAEA88870D4839E018F0223C863B3CA765880C18E0E7",
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": true,
+                "redundancyMode": "None",
+                "storageAccountRequired": false,
+                "keyVaultReferenceIdentity": "SystemAssigned"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/slots/basicPublishingCredentialsPolicies",
+            "apiVersion": "2022-09-01",
+            "name": "spocogslrpbackend/dev/ftp",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites/slots', 'spocogslrpbackend', 'dev')]",
+                "[resourceId('Microsoft.Web/sites', 'spocogslrpbackend')]"
+            ],
+            "properties": {
+                "allow": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/slots/basicPublishingCredentialsPolicies",
+            "apiVersion": "2022-09-01",
+            "name": "spocogslrpbackend/dev/scm",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites/slots', 'spocogslrpbackend', 'dev')]",
+                "[resourceId('Microsoft.Web/sites', 'spocogslrpbackend')]"
+            ],
+            "properties": {
+                "allow": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/slots/config",
+            "apiVersion": "2022-09-01",
+            "name": "spocogslrpbackend/dev/web",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites/slots', 'spocogslrpbackend', 'dev')]",
+                "[resourceId('Microsoft.Web/sites', 'spocogslrpbackend')]"
+            ],
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v6.0",
+                "phpVersion": "5.6",
+                "requestTracingEnabled": true,
+                "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "httpLoggingEnabled": true,
+                "acrUseManagedIdentityCreds": false,
+                "logsDirectorySizeLimit": 100,
+                "detailedErrorLoggingEnabled": true,
+                "publishingUsername": "$spocogslrpbackend__dev",
+                "scmType": "VSTSRM",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": false,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "vnetRouteAllEnabled": false,
+                "vnetPrivatePortsCount": 0,
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 2147483647,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 2147483647,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "scmMinTlsVersion": "1.0",
+                "ftpsState": "AllAllowed",
+                "preWarmedInstanceCount": 0,
+                "elasticWebAppScaleLimit": 0,
+                "functionsRuntimeScaleMonitoringEnabled": false,
+                "minimumElasticInstanceCount": 1,
+                "azureStorageAccounts": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/slots/hostNameBindings",
+            "apiVersion": "2022-09-01",
+            "name": "spocogslrpbackend/dev/spocogslrpbackend-dev.azurewebsites.net",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites/slots', 'spocogslrpbackend', 'dev')]",
+                "[resourceId('Microsoft.Web/sites', 'spocogslrpbackend')]"
+            ],
+            "properties": {
+                "siteName": "spocogslrpbackend(dev)",
+                "hostNameType": "Verified"
+            }
         }
-      ]
-    }
-  ]
+    ]
 }
